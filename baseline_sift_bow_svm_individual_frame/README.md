@@ -7,6 +7,7 @@ There are 4 main steps in this method:
 * Build Bag-of-Words vector for each frame.
 * Train with SVM.
 
+---
 ### How to run
 1. `python extract_sift.py`: extract SIFT features from videos.
 2. `python make_dataset.py`: based on the datset splitting instruction on KTH webpage, split the computed SIFT features into train, dev, and test set. This also generates a file `train_keypoints.p` of all SIFT features in the train set whose format is specifically used for clustering.
@@ -15,12 +16,14 @@ There are 4 main steps in this method:
 5. `python train_svm.py --dataset_bow=data/train_bow_c1000.p --C=1 --output=data/svm_C1_c1000.p`: train linear SVM on BoW vectors of training set.
 6. `python evaluate.py --svm_file=data/svm_C1_c1000.p --bow_file=data/test_bow_c1000.p`: use computed SVM classifier to classify videos in test set.
 
+---
 ### SIFT Feature Extraction
 Because there can be a lot of frames in a video that do not contain human, we use the built-in HOG human detector of OpenCV to look for human in a frame. Having found a human, we draw a bounding box around the human and only compute SIFT features inside this box.
 
 The following table shows the number of frames per category containing human in the training set. Note that these are only the frames that were detected by the OpenCV's built-in HOG human detector. There is limitation in this detector because it was not trained on the KTH dataset. There are a lot of frames in categories with fast moving action such as running and jogging that the human was failed to be detected.
+
 | Category       | # frames human detected | # SIFT keypoints |
-| ---------------|:-----------------------:|:----------------:|
+| -------------- |:-----------------------:|:----------------:|
 | boxing         | 5892                    | 189309           |
 | handclapping   | 6978                    | 253708           |
 | handwaving     | 7984                    | 286754           |
@@ -30,6 +33,7 @@ The following table shows the number of frames per category containing human in 
 
 The total number of keypoints is enormous, thus we randomly sample a portion of them for training. To keep the training data balanced between classes, we randomly sample 10000 keypoints in each category and use them to build our codebook.
 
+---
 ### Training & Model Selection
 We use K-means clustering with different number of clusters. These clusters are used for vector quantization and building Bag-of-Words (BoW) vector for each frame. We then train a linear SVM classifier on this set of BoW vectors. Experimental results show that linear SVM classifier produce better results than SVM with other types of kernels.
 
@@ -39,6 +43,7 @@ The validation set is used for evaluating our model with different configuration
 * Type of SVM kernel: linear.
 * Penalty C of linear SVM classifier: 1.
 
+---
 ### Results
 Accuracy on the test set is only 47.22%.
 Three potential problems could be:

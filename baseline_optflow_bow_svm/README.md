@@ -5,6 +5,7 @@ There are 4 main steps in this method:
 * Build Bag-of-Words vector for each video.
 * Train with SVM.
 
+---
 ### How to run
 1. `python extract_optical_flow.py`: extract optical flow in the x and y direction for each frame in all videos.
 2. `python make_dataset.py`: based on the datset splitting instruction on KTH webpage, split the computed optical flow features into train, dev, and test set. This also generates a file `train_keypoints.p` of all optical flow features in the train set whose format is specifically used for clustering.
@@ -13,11 +14,13 @@ There are 4 main steps in this method:
 5. `python train_svm.py --dataset_bow=data/train_bow_c200.p --C=1 --output=data/svm_C1_c200.p`: train linear SVM on BoW vectors of training set.
 6. `python evaluate.py --svm_file=data/svm_C1_c200.p --bow_file=data/test_bow_c200.p`: use computed SVM classifier to classify videos in test set.
 
+---
 ### Optical Flow Computation
 Given a current frame and its previous frame, we can compute its optical flow feature using the built-in dense optical flow Gunnar Farneback's algorithm of OpenCV. Thus, given a video with N frames, we can compute a set of N-1 optical flow feature descriptors.
 
 As the videos' resolution are 160x120 and we want to save memory, we only sample the optical flow values on the rows and columns whose indices are multiples of 10 (i.e. row and columnn 0, 10, 20, ...). The optical flow descriptor for a frame will have size 16x12x2 = 384 (2 comes from the horizontal and vertical direction).
 
+---
 ### Training & Model Selection
 We use K-means clustering with different number of clusters. These clusters are used for vector quantization to assign each optical flow descriptor to its nearest codeword.
 
@@ -29,5 +32,6 @@ The validation set is used for evaluating our model with different configuration
 * Type of SVM kernel: linear.
 * Penalty C of linear SVM classifier: 1.
 
+---
 ### Results
 Accuracy on the test set is 78.24%. This result outperforms the other method of using SIFT feature and considering each individual frame as an instance, which only achieves 47.22%.
