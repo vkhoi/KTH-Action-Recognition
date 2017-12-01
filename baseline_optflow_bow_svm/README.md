@@ -16,7 +16,7 @@ There are 4 main steps in this method:
 ### Optical Flow Computation
 Given a current frame and its previous frame, we can compute its optical flow feature using the built-in dense optical flow Gunnar Farneback's algorithm of OpenCV. Thus, given a video with N frames, we can compute a set of N-1 optical flow feature descriptors.
 
-As the videos' resolution are $$160 \times 120$$ and we want to save memory, we only sample the optical flow values on the rows and columns whose indices are multiples of 10 (i.e. row and columnn 0, 10, 20, ...). The optical flow descriptor for a frame will have size $$16 \times 12 \times 2 = 384$$ ($$2$$ comes from the horizontal and vertical direction).
+As the videos' resolution are 160x120 and we want to save memory, we only sample the optical flow values on the rows and columns whose indices are multiples of 10 (i.e. row and columnn 0, 10, 20, ...). The optical flow descriptor for a frame will have size 16x12x2 = 384 (2 comes from the horizontal and vertical direction).
 
 ### Training & Model Selection
 We use K-means clustering with different number of clusters. These clusters are used for vector quantization to assign each optical flow descriptor to its nearest codeword.

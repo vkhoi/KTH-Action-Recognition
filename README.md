@@ -4,7 +4,7 @@ In this work, we would like to explore different machine learning techniques in 
 
 ## KTH dataset
 Official web page of KTH dataset: [link](http://www.nada.kth.se/cvap/actions)
-The KTH dataset consists of videos of humans performing 6 types of action: boxing, handclapping, handwaving, jogging, running, and walking. There are 25 subjects performing these actions in 4 scenarios: outdoor, outdoor with scale variation, outdoor with different clothes, and indoor. The total number of videos is therefore $25 \times 4 \times 6 = 600$. The videos' frame rate are 25fps and their resolution is $160 \times 120$. More information about the dataset can be looked up at the website.
+The KTH dataset consists of videos of humans performing 6 types of action: boxing, handclapping, handwaving, jogging, running, and walking. There are 25 subjects performing these actions in 4 scenarios: outdoor, outdoor with scale variation, outdoor with different clothes, and indoor. The total number of videos is therefore 25x4x6 = 600. The videos' frame rate are 25fps and their resolution is 160x120. More information about the dataset can be looked up at the website.
 
 ## Methods
 We have tried the following approaches:
