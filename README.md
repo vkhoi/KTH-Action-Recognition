@@ -10,9 +10,6 @@ The KTH dataset consists of videos of humans performing 6 types of action: boxin
 We have tried the following approaches:
 * SIFT Features + Bag-of-Words + SVM.
 * Optical Flow + Bag-of-Words + SVM.
-* Convolutional Neural Network 2D on raw images.
-* Convolutional Neural Network 2D on raw images and optical flow.
-* Convolutional Neural Network 3D on raw images and optical flow.
 
 ## Prerequisites
 * Python OpenCV.

@@ -24,10 +24,10 @@ We use K-means clustering with different number of clusters. These clusters are 
 Next, we build Bag-of-Words (BoW) vector for each video. A BoW vector is like a histogram that counts the frequency of optical flow descriptors which appear in a video. We also perform TF-IDF weighting scheme since it leads to better accuracy. We then train a linear SVM classifier on our training set. As the number of videos in our training set is only 192, the training process takes less than a second, which is a lot faster than the method of considering each individual frame as an instance.
 
 The validation set is used for evaluating our model with different configurations. The best hyperparameters are:
-* Number of clusters: 500.
+* Number of clusters: 200.
 * Use TF-IDF weighting scheme for BoW.
 * Type of SVM kernel: linear.
 * Penalty C of linear SVM classifier: 1.
 
 ### Results
-Accuracy on the test set is 76.85%. This result outperforms the other method of using SIFT feature and considering each individual frame as an instance, which only achieves 47.22%.
+Accuracy on the test set is 78.24%. This result outperforms the other method of using SIFT feature and considering each individual frame as an instance, which only achieves 47.22%.
