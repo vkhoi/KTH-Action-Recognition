@@ -10,8 +10,8 @@ The KTH dataset consists of videos of humans performing 6 types of action: boxin
 ---
 ## Methods
 We have tried the following approaches:
-* SIFT Features + Bag-of-Words + SVM.
-* Optical Flow + Bag-of-Words + SVM.
+* SIFT Features + Bag-of-Words + SVM: 47.22%.
+* Optical Flow + Bag-of-Words + SVM: 78.24%.
 
 ---
 ## Prerequisites

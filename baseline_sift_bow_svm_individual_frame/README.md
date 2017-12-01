@@ -9,12 +9,30 @@ There are 4 main steps in this method:
 
 ---
 ### How to run
-1. `python extract_sift.py`: extract SIFT features from videos.
-2. `python make_dataset.py`: based on the datset splitting instruction on KTH webpage, split the computed SIFT features into train, dev, and test set. This also generates a file `train_keypoints.p` of all SIFT features in the train set whose format is specifically used for clustering.
-3. `python clustering.py --dataset=data/train_keypoints.p --clusters=1000`: run K-means on `train_keypoints.p` with 100 as the number of clusters and produce the codebook.
-4. `python make_bow_vector.py --codebook=data/cb_1000clusters.p --tfidf=1 --dataset=data/train.p --output=data/train_bow_c1000.p`: make BoW vector for every video frame in the training set, using the computed clusters with TF-IDF weighting scheme.
-5. `python train_svm.py --dataset_bow=data/train_bow_c1000.p --C=1 --output=data/svm_C1_c1000.p`: train linear SVM on BoW vectors of training set.
-6. `python evaluate.py --svm_file=data/svm_C1_c1000.p --bow_file=data/test_bow_c1000.p`: use computed SVM classifier to classify videos in test set.
+1. Extract SIFT features from videos.
+```bash
+$ python extract_sift.py
+```
+2. Based on the datset splitting instruction on KTH webpage, split the computed SIFT features into train, dev, and test set. This also generates a file `train_keypoints.p` of all SIFT features in the train set whose format is specifically used for clustering.
+```bash
+$ python make_dataset.py
+```
+3. Run K-means on `train_keypoints.p` with 100 as the number of clusters and produce the codebook.
+```bash
+$ python clustering.py --dataset=data/train_keypoints.p --clusters=1000
+```
+4. Make BoW vector for every video frame in the training set, using the computed clusters with TF-IDF weighting scheme.
+```bash
+$ python make_bow_vector.py --codebook=data/cb_1000clusters.p --tfidf=1 --dataset=data/train.p --output=data/train_bow_c1000.p
+```
+5. Train linear SVM on BoW vectors of training set.
+```bash
+$ python train_svm.py --dataset_bow=data/train_bow_c1000.p --C=1 --output=data/svm_C1_c1000.p
+```
+6. Use computed SVM classifier to classify videos in test set and get accuracy result.
+```bash
+$ python evaluate.py --svm_file=data/svm_C1_c1000.p --bow_file=data/test_bow_c1000.p
+```
 
 ---
 ### SIFT Feature Extraction
