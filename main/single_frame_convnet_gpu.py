@@ -43,17 +43,21 @@ class SingleFrameConvNet(nn.Module):
 
 		return out
 
-def evaluate(dataloader):
+def evaluate(net, dataloader):
 	loss = 0
 	correct = 0
 	total = 0
+
+	# Switch to evaluation mode.
+	net.eval()
 
 	for i, samples in enumerate(dataloader):
 		images = Variable(samples["image"]).cuda()
 		labels = Variable(samples["label"]).cuda()
 
 		outputs = net(images)
-		loss += (nn.CrossEntropyLoss(size_average=False)(outputs, labels)).data[0]
+		loss += (nn.CrossEntropyLoss(size_average=False)
+			(outputs, labels)).data[0]
 
 		score, predicted = torch.max(outputs, 1)
 		correct += (labels.data == predicted.data).sum()
@@ -126,6 +130,9 @@ if __name__ == "__main__":
 
 	print("start training")
 	for epoch in range(start_epoch, start_epoch + num_epochs):
+		# Switch to train mode.
+		net.train()
+
 		for i, samples in enumerate(train_loader):
 			images = Variable(samples["image"]).cuda()
 			labels = Variable(samples["label"]).cuda()
@@ -143,9 +150,9 @@ if __name__ == "__main__":
 					len(train_dataset) // batch_size, loss.data[0]))
 		
 		print("Evaluating...")
-		train_loss, train_acc = evaluate(train_loader_sequential)
+		train_loss, train_acc = evaluate(net, train_loader_sequential)
 		if flag_validate:
-			dev_loss, dev_acc = evaluate(dev_loader)
+			dev_loss, dev_acc = evaluate(net, dev_loader)
 			print("epoch %d/%d, train_loss = %s, traic_acc = %s, "
 				"dev_loss = %s, dev_acc = %s"
 				% (epoch, start_epoch + num_epochs - 1, train_loss, train_acc,
