@@ -6,9 +6,6 @@ import pickle
 from sklearn.cluster import KMeans
 from numpy import size
 
-CATEGORIES = ["boxing", "handclapping", "handwaving", "jogging", "running", 
-	"walking"]
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Run KMeans on training set")
 	parser.add_argument("--dataset", type=str, default="data/train_keypoints.p",

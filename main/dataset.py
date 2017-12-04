@@ -48,7 +48,7 @@ class RawDataset(Dataset):
 		# Need dummy last channel for conv2d layer.
 		images = pickle.load(open(X, "rb"))
 		for i in range(len(images)):
-			images[i] = images[i].reshape((1, 120, 160))
+			images[i] = images[i].reshape((1, 60, 80))
 		images = np.array(images, dtype=np.float32)
 
 		labels = pickle.load(open(y, "rb"))

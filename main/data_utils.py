@@ -4,6 +4,7 @@ import os
 import pickle
 
 from PIL import Image
+from scipy.misc.pilutil import imresize
 
 CATEGORIES = ["boxing", "handclapping", "handwaving", "jogging", "running", 
 	"walking"]
@@ -46,6 +47,7 @@ def make_raw_dataset(dataset="train"):
 				frame = Image.fromarray(np.array(frame))
 				frame = frame.convert("L")
 				frame = np.array(frame.getdata(), dtype=np.uint8).reshape((120, 160))
+				frame = imresize(frame, (60, 80))
 
 				X.append(frame)
 				y.append(category)

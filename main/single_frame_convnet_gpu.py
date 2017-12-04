@@ -49,8 +49,8 @@ def evaluate(dataloader):
 	total = 0
 
 	for i, samples in enumerate(dataloader):
-		images = Variable(samples["image"])
-		labels = Variable(samples["label"])
+		images = Variable(samples["image"]).cuda()
+		labels = Variable(samples["label"]).cuda()
 
 		outputs = net(images)
 		loss += (nn.CrossEntropyLoss(size_average=False)(outputs, labels)).data[0]
@@ -120,13 +120,15 @@ if __name__ == "__main__":
 		optimizer.load_state_dict(checkpoint["optimizer"])
 		hist = checkpoint["hist"]
 
-	criterion = nn.CrossEntropyLoss()
+	net.cuda()
+
+	criterion = nn.CrossEntropyLoss().cuda()  
 
 	print("start training")
 	for epoch in range(start_epoch, start_epoch + num_epochs):
 		for i, samples in enumerate(train_loader):
-			images = Variable(samples["image"])
-			labels = Variable(samples["label"])
+			images = Variable(samples["image"]).cuda()
+			labels = Variable(samples["label"]).cuda()
 
 			optimizer.zero_grad()
 			outputs = net(images)

@@ -1,4 +1,4 @@
-## SIFT + Bag-of-Words + SVM (individual frame)
+## SIFT + Bag-of-Words + SVM (frame-level)
 In this approach, we consider each frame as an individual instance and we classify each frame instead of a whole video. The majority of all frames' classification results is selected as the answer for a video.
 
 There are 4 main steps in this method:
@@ -17,7 +17,7 @@ $ python extract_sift.py
 ```bash
 $ python make_dataset.py
 ```
-3. Run K-means on `train_keypoints.p` with 100 as the number of clusters and produce the codebook.
+3. Run K-means on `train_keypoints.p` with 1000 as the number of clusters and produce the codebook.
 ```bash
 $ python clustering.py --dataset=data/train_keypoints.p --clusters=1000
 ```
