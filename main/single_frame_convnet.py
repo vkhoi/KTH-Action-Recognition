@@ -59,8 +59,6 @@ def evaluate(dataloader):
 		
 		total += labels.size(0)
 
-		break
-
 	acc = correct / total
 	loss /= total
 
