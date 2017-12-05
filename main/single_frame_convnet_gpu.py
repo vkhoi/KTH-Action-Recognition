@@ -10,30 +10,33 @@ class SingleFrameConvNet(nn.Module):
 		super(SingleFrameConvNet, self).__init__()
 
 		self.conv1 = nn.Sequential(
-			nn.Conv2d(1, 64, kernel_size=5, padding=2),
+			nn.Conv2d(1, 32, kernel_size=5, padding=2),
+			nn.BatchNorm2d(32),
 			nn.ReLU(),
-			nn.MaxPool2d(kernel_size=2))
+			nn.MaxPool2d(kernel_size=2),
+			nn.Dropout(0.5))
 
 		self.conv2 = nn.Sequential(
-			nn.Conv2d(64, 128, kernel_size=3, padding=1),
+			nn.Conv2d(32, 64, kernel_size=3, padding=1),
+			nn.BatchNorm2d(64),
 			nn.ReLU(),
-			nn.MaxPool2d(kernel_size=2))
+			nn.MaxPool2d(kernel_size=2),
+			nn.Dropout(0.5))
 
 		self.conv3 = nn.Sequential(
-			nn.Conv2d(128, 256, kernel_size=3, padding=1),
+			nn.Conv2d(64, 128, kernel_size=3, padding=1),
+			nn.BatchNorm2d(128),
 			nn.ReLU(),
-			nn.MaxPool2d(kernel_size=2))
+			nn.MaxPool2d(kernel_size=2),
+			nn.Dropout(0.5))
 
-		self.fc1 = nn.Linear(17920, 256)
-		self.fc2 = nn.Linear(256, 6)
+		self.fc1 = nn.Linear(8960, 128)
+		self.fc2 = nn.Linear(128, 6)
 
 	def forward(self, x):
 		out = self.conv1(x)
-		out = nn.Dropout(0.5)(out)
 		out = self.conv2(out)
-		out = nn.Dropout(0.5)(out)
 		out = self.conv3(out)
-		out = nn.Dropout(0.5)(out)
 
 		out = out.view(out.size(0), -1)
 		out = self.fc1(out)
@@ -63,7 +66,7 @@ def evaluate(net, dataloader):
 		correct += (labels.data == predicted.data).sum()
 		
 		total += labels.size(0)
-		
+
 	acc = correct / total
 	loss /= total
 
@@ -126,7 +129,7 @@ if __name__ == "__main__":
 
 	net.cuda()
 
-	criterion = nn.CrossEntropyLoss().cuda()  
+	criterion = nn.CrossEntropyLoss().cuda()
 
 	print("start training")
 	for epoch in range(start_epoch, start_epoch + num_epochs):
