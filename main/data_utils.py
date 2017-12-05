@@ -1,4 +1,5 @@
 import imageio
+import cv2
 import numpy as np
 import os
 import pickle
@@ -71,6 +72,74 @@ def make_raw_dataset(dataset="train"):
 			})
 
 	pickle.dump(data, open("data/%s.p" % dataset, "wb"))
+	
+def make_optflow_dataset(dataset="train"):
+	if dataset == "train":
+		ID = TRAIN_PEOPLE_ID
+	elif dataset == "dev":
+		ID = DEV_PEOPLE_ID
+	else:
+		ID = TEST_PEOPLE_ID
+
+	# Setup parameters for optical flow.
+	farneback_params = dict(winsize=20, iterations=1,
+		flags=cv2.OPTFLOW_FARNEBACK_GAUSSIAN, levels=1,
+		pyr_scale=0.5, poly_n=5, poly_sigma=1.1, flow=None)
+
+	frames_idx = parse_sequence_file()
+
+	data = []
+
+	for category in CATEGORIES:
+		# Get all files in current category's folder.
+		folder_path = os.path.join("..", "dataset", category)
+		filenames = sorted(os.listdir(folder_path))
+
+		for filename in filenames:
+			filepath = os.path.join("..", "dataset", category, filename)
+
+			# Get id of person in this video.
+			person_id = int(filename.split("_")[0][6:])
+			if person_id not in ID:
+				continue
+
+			vid = imageio.get_reader(filepath, "ffmpeg")
+
+			frames = []
+
+			prev_frame = None
+			# Add each frame to correct list.
+			for i, frame in enumerate(vid):
+				# Boolean flag to check if current frame contains human.
+				ok = False
+				for seg in frames_idx[filename]:
+					if i >= seg[0] and i <= seg[1]:
+						ok = True
+						break
+				if not ok:
+					continue
+
+				# Convert to grayscale.
+				frame = Image.fromarray(np.array(frame))
+				frame = frame.convert("L")
+				frame = np.array(frame.getdata(), dtype=np.uint8).reshape((120, 160))
+				frame = imresize(frame, (60, 80))
+
+				if prev_frame is not None:
+					# Calculate optical flow.
+					flows = cv2.calcOpticalFlowFarneback(prev_frame, frame,
+						**farneback_params)
+					subsampled = np.zeros()
+
+				frames.append(frame)
+
+			data.append({
+				"filename": filename,
+				"category": category,
+				"frames": frames	
+			})
+
+	pickle.dump(data, open("data/%s_flow.p" % dataset, "wb"))
 
 def parse_sequence_file():
 	print("Parsing ../dataset/00sequences.txt")
