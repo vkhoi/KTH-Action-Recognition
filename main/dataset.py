@@ -16,12 +16,7 @@ CATEGORY_IDX = {
 
 class RawDataset(Dataset):
 	def __init__(self, directory, dataset="train", mean=None):
-		self.images, self.labels = self.read_dataset(directory, dataset)
-
-		if dataset == "train":
-			self.mean = np.mean(self.images, axis=0)
-		elif mean is not None:
-			self.images -= mean
+		self.images, self.labels = self.read_dataset(directory, dataset, mean)
 
 		self.images = torch.from_numpy(self.images)
 		self.labels = torch.from_numpy(self.labels)
@@ -34,27 +29,31 @@ class RawDataset(Dataset):
 
 		return sample
 
-	def read_dataset(self, directory, dataset="train"):
+	def read_dataset(self, directory, dataset="train", mean=None):
 		if dataset == "train":
-			X = os.path.join(directory, "X_train.p")
-			y = os.path.join(directory, "y_train.p")
+			filepath = os.path.join(directory, "train.p")
 		elif dataset == "dev":
-			X = os.path.join(directory, "X_dev.p")
-			y = os.path.join(directory, "y_dev.p")
+			filepath = os.path.join(directory, "dev.p")
 		else:
-			X = os.path.join(directory, "X_test.p")
-			y = os.path.join(directory, "y_test.p")
+			filepath = os.path.join(directory, "test.p")
 
-		# Need dummy last channel for conv2d layer.
-		images = pickle.load(open(X, "rb"))
-		for i in range(len(images)):
-			images[i] = images[i].reshape((1, 60, 80))
+		videos = pickle.load(open(filepath, "rb"))
+
+		images = []
+		labels = []
+		for video in videos:
+			for frame in video["frames"]:
+				images.append(frame.reshape((1, 60, 80)))
+				labels.append(CATEGORY_IDX[video["category"]])
+
 		images = np.array(images, dtype=np.float32)
-
-		labels = pickle.load(open(y, "rb"))
-		for i in range(len(labels)):
-			labels[i] = CATEGORY_IDX[labels[i]]
 		labels = np.array(labels, dtype=np.uint8)
+
+		if dataset == "train":
+			self.mean = np.mean(images, axis=0)
+			images -= self.mean
+		elif mean is not None:
+			images -= mean
 
 		return images, labels
 
