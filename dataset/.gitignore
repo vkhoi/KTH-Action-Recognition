@@ -3,3 +3,4 @@
 # Except this file
 !.gitignore
 !download.sh
+!00sequences.txt
