@@ -127,11 +127,11 @@ if __name__ == "__main__":
 		net.train()
 
 		for i, samples in enumerate(train_loader):
-			images = Variable(samples["image"])
-			labels = Variable(samples["label"])
+			block_frames = Variable(samples["block_frames"])
+			labels = Variable(samples["labels"])
 
 			optimizer.zero_grad()
-			outputs = net(images)
+			outputs = net(block_frames)
 
 			loss = criterion(outputs, labels)
 			loss.backward()

@@ -129,11 +129,11 @@ if __name__ == "__main__":
 		net.train()
 
 		for i, samples in enumerate(train_loader):
-			images = Variable(samples["image"]).cuda()
-			labels = Variable(samples["label"]).cuda()
+			block_frames = Variable(samples["block_frames"]).cuda()
+			labels = Variable(samples["labels"]).cuda()
 
 			optimizer.zero_grad()
-			outputs = net(images)
+			outputs = net(block_frames)
 
 			loss = criterion(outputs, labels)
 			loss.backward()
