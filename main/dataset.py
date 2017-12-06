@@ -58,14 +58,6 @@ class RawDataset(Dataset):
         elif mean is not None:
             instances -= mean
 
-        if dataset == "train":
-            p = np.random.choice(len(instances), 1024, replace=False)
-        else:
-            p = np.random.choice(len(instances), 256, replace=False)
-
-        instances = instances[p]
-        labels = labels[p]
-
         return instances, labels
 
 class BlockFrameDataset(Dataset):
@@ -117,13 +109,5 @@ class BlockFrameDataset(Dataset):
             instances -= self.mean
         elif mean is not None:
             instances -= mean
-
-        if dataset == "train":
-            p = np.random.choice(len(instances), 1024, replace=False)
-        else:
-            p = np.random.choice(len(instances), 256, replace=False)
-
-        instances = instances[p]
-        labels = labels[p]
 
         return instances, labels

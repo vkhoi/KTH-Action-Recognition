@@ -26,6 +26,7 @@ class CNNSingleFrame(nn.Module):
             nn.Dropout(0.5))
 
         self.fc1 = nn.Linear(2560, 128)
+        self.dropfc1 = nn.Dropout(0.5)
         self.fc2 = nn.Linear(128, 6)
 
     def forward(self, x):
@@ -36,8 +37,10 @@ class CNNSingleFrame(nn.Module):
         out = out.view(out.size(0), -1)
         out = self.fc1(out)
         out = nn.ReLU()(out)
-        out = nn.Dropout(0.5)(out)
+        out = self.dropfc1(out)
         out = self.fc2(out)
 
         return out
 
+    def alo(self):
+        print("haha")

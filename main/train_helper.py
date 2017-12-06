@@ -44,7 +44,7 @@ def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
     train_loader_sequential = torch.utils.data.DataLoader(dataset=train_set,
         batch_size=batch_size, shuffle=False)
     dev_loader = torch.utils.data.DataLoader(dataset=dev_set,
-            batch_size=batch_size, shuffle=False)
+        batch_size=batch_size, shuffle=False)
 
     # Use Adam optimizer.
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -89,8 +89,8 @@ def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
             optimizer.step()
 
             if (i+1) % log == 0:
-                print("epoch %d/%d, iteration %d/%d, loss: %s" % (epoch,
-                    start_epoch + num_epochs - 1, i + 1,
+                print("epoch %d/%d, iteration %d/%d, loss: %s"
+                    % (epoch, start_epoch + num_epochs - 1, i + 1,
                     len(train_set) // batch_size, loss.data[0]))
         
         # Get overall loss & accuracy on training set.
@@ -103,7 +103,7 @@ def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
             print("epoch %d/%d, train_loss = %s, traic_acc = %s, "
                 "dev_loss = %s, dev_acc = %s"
                 % (epoch, start_epoch + num_epochs - 1,
-                    train_loss, train_acc, dev_loss, dev_acc))
+                train_loss, train_acc, dev_loss, dev_acc))
 
             hist.append({
                 "train_loss": train_loss, "train_acc": train_acc,
