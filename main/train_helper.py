@@ -94,11 +94,11 @@ def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
                     len(train_set) // batch_size, loss.data[0]))
         
         # Get overall loss & accuracy on training set.
-        train_loss, train_acc = evaluate(model, train_loader_sequential)
+        train_loss, train_acc = evaluate(model, train_loader_sequential, use_cuda)
 
         if validate:
             # Get overall loss & accuracy on dev set.
-            dev_loss, dev_acc = evaluate(model, dev_loader)
+            dev_loss, dev_acc = evaluate(model, dev_loader, use_cuda)
 
             print("epoch %d/%d, train_loss = %s, traic_acc = %s, "
                 "dev_loss = %s, dev_acc = %s"
