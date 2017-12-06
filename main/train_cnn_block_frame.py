@@ -48,11 +48,11 @@ if __name__ == "__main__":
         resume = False
 
     # Create directory for storing checkpoints.
-    os.makedirs("data/cnn_block_frame", exist_ok=True)
+    os.makedirs(os.path.join(dataset_dir, "cnn_block_frame"), exist_ok=True)
 
     print("Start training")
     train(model, num_epochs, train_set, dev_set, lr=lr, batch_size=batch_size,
         start_epoch=start_epoch, log=log_interval, 
-        checkpoint_path="data/cnn_block_frame",
+        checkpoint_path=os.path.join(dataset_dir, "cnn_block_frame"),
         validate=True, resume=resume, use_cuda=cuda)
 
