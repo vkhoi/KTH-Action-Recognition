@@ -105,7 +105,8 @@ def make_optflow_dataset(dataset="train"):
 
             vid = imageio.get_reader(filepath, "ffmpeg")
 
-            frames = []
+            flow_x = []
+            flow_y = []
 
             prev_frame = None
             # Add each frame to correct list.
@@ -129,14 +130,24 @@ def make_optflow_dataset(dataset="train"):
                     # Calculate optical flow.
                     flows = cv2.calcOpticalFlowFarneback(prev_frame, frame,
                         **farneback_params)
-                    subsampled = np.zeros()
+                    subsampled_x = np.zeros((30, 40), dtype=np.float32)
+                    subsampled_y = np.zeros((30, 40), dtype=np.float32)
 
-                frames.append(frame)
+                    for r in range(30):
+                        for c in range(40):
+                            subsampled_x[r, c] = flows[r*2, c*2, 0]
+                            subsampled_y[r, c] = flows[r*2, c*2, 1]
+
+                    flow_x.append(subsampled_x)
+                    flow_y.append(subsampled_y)
+
+                prev_frame = frame
 
             data.append({
                 "filename": filename,
                 "category": category,
-                "frames": frames    
+                "flow_x": flow_x,
+                "flow_y": flow_y    
             })
 
     pickle.dump(data, open("data/%s_flow.p" % dataset, "wb"))
