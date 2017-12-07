@@ -57,12 +57,12 @@ class CNNBlockFrameFlow(nn.Module):
         out_frames = self.conv2_frame(out_frames)
         out_frames = out_frames.view(out_frames.size(0), -1)
 
-        out_flow_x = self.conv1_frame(flow_x)
-        out_flow_x = self.conv2_frame(out_flow_x)
+        out_flow_x = self.conv1_flow_x(flow_x)
+        out_flow_x = self.conv2_flow_x(out_flow_x)
         out_flow_x = out_flow_x.view(out_flow_x.size(0), -1)
 
-        out_flow_y = self.conv1_frame(flow_y)
-        out_flow_y = self.conv2_frame(out_flow_y)
+        out_flow_y = self.conv1_flow_y(flow_y)
+        out_flow_y = self.conv2_flow_y(out_flow_y)
         out_flow_y = out_flow_y.view(out_flow_y.size(0), -1)
 
         out = torch.cat([out_frames, out_flow_x, out_flow_y], 1)
