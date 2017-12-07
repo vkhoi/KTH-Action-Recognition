@@ -4,7 +4,30 @@ import torch.nn as nn
 
 from torch.autograd import Variable
 
-def evaluate(model, dataloader, use_cuda=False):
+def get_outputs(model, instances, flow=False, use_cuda=False):
+
+    if flow:
+        frames = Variable(instances["frames"])
+        flow_x = Variable(instances["flow_x"])
+        flow_y = Variable(instances["flow_y"])
+
+        if use_cuda:
+            frames = frames.cuda()
+            flow_x = flow_x.cuda()
+            flow_y = flow_y.cuda()
+
+        outputs = model(frames, flow_x, flow_y)
+
+    else:
+        instances = Variable(instances)
+        if use_cuda:
+            instances = instances.cuda()
+
+        outputs = model(instances)
+
+    return outputs
+
+def evaluate(model, dataloader, flow=False, use_cuda=False):
     loss = 0
     correct = 0
     total = 0
@@ -13,13 +36,13 @@ def evaluate(model, dataloader, use_cuda=False):
     model.eval()
 
     for i, samples in enumerate(dataloader):
-        instances = Variable(samples["instances"])
+        outputs = get_outputs(model, samples["instances"], flow=flow,
+            use_cuda=use_cuda)
+
         labels = Variable(samples["labels"])
         if use_cuda:
-            instances = instances.cuda()
             labels = labels.cuda()
 
-        outputs = model(instances)
         loss += (nn.CrossEntropyLoss(size_average=False)
             (outputs, labels)).data[0]
 
@@ -35,7 +58,7 @@ def evaluate(model, dataloader, use_cuda=False):
 
 def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
     start_epoch=1, log=10, checkpoint_path=None, validate=False, resume=False,
-    use_cuda=False):
+    flow=False, use_cuda=False):
 
     train_loader = torch.utils.data.DataLoader(dataset=train_set,
         batch_size=batch_size, shuffle=True)
@@ -73,17 +96,17 @@ def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
         model.train()
 
         for i, samples in enumerate(train_loader):
-            instances = Variable(samples["instances"])
+
             labels = Variable(samples["labels"])
             if use_cuda:
-                instances = instances.cuda()
                 labels = labels.cuda()
 
             # Zero out gradient from previous iteration.
             optimizer.zero_grad()
 
             # Forward, backward, and optimize.
-            outputs = model(instances)
+            outputs = get_outputs(model, samples["instances"], flow=flow,
+                use_cuda=use_cuda)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -94,11 +117,13 @@ def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
                     len(train_set) // batch_size, loss.data[0]))
         
         # Get overall loss & accuracy on training set.
-        train_loss, train_acc = evaluate(model, train_loader_sequential, use_cuda)
+        train_loss, train_acc = evaluate(model, train_loader_sequential,
+            flow=flow, use_cuda=use_cuda)
 
         if validate:
             # Get overall loss & accuracy on dev set.
-            dev_loss, dev_acc = evaluate(model, dev_loader, use_cuda)
+            dev_loss, dev_acc = evaluate(model, dev_loader, flow=flow,
+                use_cuda=use_cuda)
 
             print("epoch %d/%d, train_loss = %s, traic_acc = %s, "
                 "dev_loss = %s, dev_acc = %s"

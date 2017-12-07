@@ -2,7 +2,7 @@ import argparse
 import os
 
 from dataset import *
-from models.cnn_block_frame import CNNBlockFrame
+from models.cnn_block_frame_flow import CNNBlockFrameFlow
 from train_helper import *
 
 if __name__ == "__main__":
@@ -36,11 +36,11 @@ if __name__ == "__main__":
         cuda = False
 
     print("Loading dataset")
-    train_set = BlockFrameDataset(dataset_dir, "train")
-    dev_set = BlockFrameDataset(dataset_dir, "dev", train_set.mean)
+    train_set = BlockFrameFlowDataset(dataset_dir, "train")
+    dev_set = BlockFrameFlowDataset(dataset_dir, "dev", train_set.mean)
 
     # Create model and optimizer.
-    model = CNNBlockFrame()
+    model = CNNBlockFrameFlow()
 
     if start_epoch > 1:
         resume = True
@@ -48,11 +48,11 @@ if __name__ == "__main__":
         resume = False
 
     # Create directory for storing checkpoints.
-    os.makedirs(os.path.join(dataset_dir, "cnn_block_frame"), exist_ok=True)
+    os.makedirs(os.path.join(dataset_dir, "cnn_block_frame_flow"), exist_ok=True)
 
     print("Start training")
     train(model, num_epochs, train_set, dev_set, lr=lr, batch_size=batch_size,
         start_epoch=start_epoch, log=log_interval, 
-        checkpoint_path=os.path.join(dataset_dir, "cnn_block_frame"),
-        validate=True, resume=resume, use_cuda=cuda)
+        checkpoint_path=os.path.join(dataset_dir, "cnn_block_frame_flow"),
+        validate=True, resume=resume, flow=True, use_cuda=cuda)
 

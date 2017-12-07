@@ -18,6 +18,8 @@ class RawDataset(Dataset):
     def __init__(self, directory, dataset="train", mean=None):
         self.instances, self.labels = self.read_dataset(directory, dataset, mean)
 
+        self.zero_center(mean)
+
         self.instances = torch.from_numpy(self.instances)
         self.labels = torch.from_numpy(self.labels)
 
@@ -31,6 +33,13 @@ class RawDataset(Dataset):
         }
 
         return sample
+
+    def zero_center(self, mean=None):
+        if mean is None:
+            mean = self.mean
+
+        for i in range(len(self.instances)):
+            self.instances[i] -= mean
 
     def read_dataset(self, directory, dataset="train", mean=None):
         if dataset == "train":
@@ -52,11 +61,7 @@ class RawDataset(Dataset):
         instances = np.array(instances, dtype=np.float32)
         labels = np.array(labels, dtype=np.uint8)
 
-        if dataset == "train":
-            self.mean = np.mean(instances, axis=0)
-            instances -= self.mean
-        elif mean is not None:
-            instances -= mean
+        self.mean = np.mean(instances, axis=0)
 
         return instances, labels
 
@@ -64,6 +69,8 @@ class BlockFrameDataset(Dataset):
     def __init__(self, directory, dataset="train", mean=None):
         self.instances, self.labels = self.read_dataset(directory, 
             dataset, mean)
+
+        self.zero_center(mean)
 
         self.instances = torch.from_numpy(self.instances)
         self.labels = torch.from_numpy(self.labels)
@@ -78,6 +85,13 @@ class BlockFrameDataset(Dataset):
         }
 
         return sample
+
+    def zero_center(self, mean=None):
+        if mean is None:
+            mean = self.mean
+
+        for i in range(len(self.instances)):
+            self.instances[i] -= mean
 
     def read_dataset(self, directory, dataset="train", mean=None):
         if dataset == "train":
@@ -104,11 +118,7 @@ class BlockFrameDataset(Dataset):
         instances = np.array(instances, dtype=np.float32)
         labels = np.array(labels, dtype=np.uint8)
 
-        if dataset == "train":
-            self.mean = np.mean(instances, axis=0)
-            instances -= self.mean
-        elif mean is not None:
-            instances -= mean
+        self.mean = np.mean(instances, axis=0)
 
         return instances, labels
 
@@ -117,7 +127,7 @@ class BlockFrameFlowDataset(Dataset):
         self.instances, self.labels = self.read_dataset(directory, 
             dataset, mean)
 
-        self.center_to_mean(mean)
+        self.zero_center(mean)
 
         for i in range(len(self.instances)):
             self.instances[i]["frames"] = torch.from_numpy(self.instances[i]["frames"])
@@ -136,7 +146,7 @@ class BlockFrameFlowDataset(Dataset):
 
         return sample
 
-    def center_to_mean(self, mean=None):
+    def zero_center(self, mean=None):
         if mean is None:
             mean = self.mean
 
@@ -216,12 +226,12 @@ class BlockFrameFlowDataset(Dataset):
 
         labels = np.array(labels, dtype=np.uint8)
 
-        if dataset == "train":
-            p = np.random.choice(len(instances), 256, replace=False)
-        else:
-            p = np.random.choice(len(instances), 64, replace=False)
+        # if dataset == "train":
+        #     p = np.random.choice(len(instances), 256, replace=False)
+        # else:
+        #     p = np.random.choice(len(instances), 64, replace=False)
 
-        instances = [instances[i] for i in p]
-        labels = labels[p]
+        # instances = [instances[i] for i in p]
+        # labels = labels[p]
 
         return instances, labels
