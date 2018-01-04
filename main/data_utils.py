@@ -8,8 +8,14 @@ import re
 from PIL import Image
 from scipy.misc.pilutil import imresize
 
-CATEGORIES = ["boxing", "handclapping", "handwaving", "jogging", "running", 
-    "walking"]
+CATEGORIES = [
+    "boxing",
+    "handclapping",
+    "handwaving",
+    "jogging",
+    "running",
+    "walking"
+]
 
 # Dataset are divided according to the instruction at:
 # http://www.nada.kth.se/cvap/actions/00sequences.txt
@@ -60,7 +66,8 @@ def make_raw_dataset(dataset="train"):
                 # Convert to grayscale.
                 frame = Image.fromarray(np.array(frame))
                 frame = frame.convert("L")
-                frame = np.array(frame.getdata(), dtype=np.uint8).reshape((120, 160))
+                frame = np.array(frame.getdata(),
+                                 dtype=np.uint8).reshape((120, 160))
                 frame = imresize(frame, (60, 80))
 
                 frames.append(frame)
@@ -82,7 +89,8 @@ def make_optflow_dataset(dataset="train"):
         ID = TEST_PEOPLE_ID
 
     # Setup parameters for optical flow.
-    farneback_params = dict(winsize=20, iterations=1,
+    farneback_params = dict(
+        winsize=20, iterations=1,
         flags=cv2.OPTFLOW_FARNEBACK_GAUSSIAN, levels=1,
         pyr_scale=0.5, poly_n=5, poly_sigma=1.1, flow=None)
 
@@ -123,13 +131,14 @@ def make_optflow_dataset(dataset="train"):
                 # Convert to grayscale.
                 frame = Image.fromarray(np.array(frame))
                 frame = frame.convert("L")
-                frame = np.array(frame.getdata(), dtype=np.uint8).reshape((120, 160))
+                frame = np.array(frame.getdata(),
+                                 dtype=np.uint8).reshape((120, 160))
                 frame = imresize(frame, (60, 80))
 
                 if prev_frame is not None:
                     # Calculate optical flow.
                     flows = cv2.calcOpticalFlowFarneback(prev_frame, frame,
-                        **farneback_params)
+                                                         **farneback_params)
                     subsampled_x = np.zeros((30, 40), dtype=np.float32)
                     subsampled_y = np.zeros((30, 40), dtype=np.float32)
 

@@ -1,8 +1,3 @@
-from dataset import *
-from torch.autograd import Variable
-
-import argparse
-import torch
 import torch.nn as nn
 
 class CNNBlockFrame(nn.Module):
@@ -20,17 +15,17 @@ class CNNBlockFrame(nn.Module):
             nn.Conv3d(16, 32, kernel_size=(4, 3, 3)),
             nn.BatchNorm3d(32),
             nn.ReLU(),
-            nn.MaxPool3d(kernel_size=(1, 2, 2)),
+            nn.MaxPool3d(kernel_size=(2, 2, 2)),
             nn.Dropout(0.5))
 
         self.conv3 = nn.Sequential(
-            nn.Conv3d(32, 64, kernel_size=(4, 3, 3)),
+            nn.Conv3d(32, 64, kernel_size=(3, 3, 3)),
             nn.BatchNorm3d(64),
             nn.ReLU(),
             nn.MaxPool3d(kernel_size=(2, 2, 2)),
             nn.Dropout(0.5))
 
-        self.fc1 = nn.Linear(7680, 128)
+        self.fc1 = nn.Linear(2560, 128)
         self.dropfc1 = nn.Dropout(0.5)
         self.fc2 = nn.Linear(128, 6)
 

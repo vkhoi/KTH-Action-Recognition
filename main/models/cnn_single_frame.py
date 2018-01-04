@@ -42,5 +42,3 @@ class CNNSingleFrame(nn.Module):
 
         return out
 
-    def alo(self):
-        print("haha")

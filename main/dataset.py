@@ -5,7 +5,7 @@ import torch
 
 from torch.utils.data import Dataset, DataLoader
 
-CATEGORY_IDX = {
+CATEGORY_INDEX = {
     "boxing": 0,
     "handclapping": 1,
     "handwaving": 2,
@@ -15,10 +15,8 @@ CATEGORY_IDX = {
 }
 
 class RawDataset(Dataset):
-    def __init__(self, directory, dataset="train", mean=None):
-        self.instances, self.labels = self.read_dataset(directory, dataset, mean)
-
-        self.zero_center(mean)
+    def __init__(self, directory, dataset="train"):
+        self.instances, self.labels = self.read_dataset(directory, dataset)
 
         self.instances = torch.from_numpy(self.instances)
         self.labels = torch.from_numpy(self.labels)
@@ -28,20 +26,17 @@ class RawDataset(Dataset):
 
     def __getitem__(self, idx):
         sample = { 
-            "instances": self.instances[idx],
-            "labels": self.labels[idx] 
+            "instance": self.instances[idx],
+            "label": self.labels[idx] 
         }
 
         return sample
 
-    def zero_center(self, mean=None):
-        if mean is None:
-            mean = self.mean
-
+    def zero_center(self, mean):
         for i in range(len(self.instances)):
-            self.instances[i] -= mean
+            self.instances[i] -= float(mean)
 
-    def read_dataset(self, directory, dataset="train", mean=None):
+    def read_dataset(self, directory, dataset="train"):
         if dataset == "train":
             filepath = os.path.join(directory, "train.p")
         elif dataset == "dev":
@@ -56,12 +51,12 @@ class RawDataset(Dataset):
         for video in videos:
             for frame in video["frames"]:
                 instances.append(frame.reshape((1, 60, 80)))
-                labels.append(CATEGORY_IDX[video["category"]])
+                labels.append(CATEGORY_INDEX[video["category"]])
 
         instances = np.array(instances, dtype=np.float32)
         labels = np.array(labels, dtype=np.uint8)
 
-        self.mean = np.mean(instances, axis=0)
+        self.mean = np.mean(instances)
 
         return instances, labels
 
@@ -91,7 +86,8 @@ class BlockFrameDataset(Dataset):
             mean = self.mean
 
         for i in range(len(self.instances)):
-            self.instances[i] -= mean
+            # self.instances[i] -= mean
+            self.instances /= 255.0
 
     def read_dataset(self, directory, dataset="train", mean=None):
         if dataset == "train":
@@ -151,10 +147,7 @@ class BlockFrameFlowDataset(Dataset):
             mean = self.mean
 
         for i in range(len(self.instances)):
-            self.instances[i]["frames"] -= mean["frames"]
-            self.instances[i]["flow_x"] -= mean["flow_x"]
-            self.instances[i]["flow_y"] -= mean["flow_y"]
-
+            self.instances[i]["frames"] /= 255
 
     def read_dataset(self, directory, dataset="train", mean=None):
         if dataset == "train":
@@ -184,7 +177,7 @@ class BlockFrameFlowDataset(Dataset):
 
             frames = video_frames[i_video]["frames"]
             flow_x = [0] + video_flows[i_video]["flow_x"]
-            flow_y = [0] + video_flows[i_video]["flow_x"]
+            flow_y = [0] + video_flows[i_video]["flow_y"]
 
             for i_frame in range(len(frames)):
                 current_block_frame.append(frames[i_frame])
