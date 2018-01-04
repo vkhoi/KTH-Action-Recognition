@@ -33,8 +33,7 @@ class RawDataset(Dataset):
         return sample
 
     def zero_center(self, mean):
-        for i in range(len(self.instances)):
-            self.instances[i] -= float(mean)
+        self.instances -= float(mean)
 
     def read_dataset(self, directory, dataset="train"):
         if dataset == "train":
@@ -61,11 +60,8 @@ class RawDataset(Dataset):
         return instances, labels
 
 class BlockFrameDataset(Dataset):
-    def __init__(self, directory, dataset="train", mean=None):
-        self.instances, self.labels = self.read_dataset(directory, 
-            dataset, mean)
-
-        self.zero_center(mean)
+    def __init__(self, directory, dataset="train"):
+        self.instances, self.labels = self.read_dataset(directory, dataset)
 
         self.instances = torch.from_numpy(self.instances)
         self.labels = torch.from_numpy(self.labels)
@@ -75,19 +71,14 @@ class BlockFrameDataset(Dataset):
 
     def __getitem__(self, idx):
         sample = { 
-            "instances": self.instances[idx], 
-            "labels": self.labels[idx] 
+            "instance": self.instances[idx], 
+            "label": self.labels[idx] 
         }
 
         return sample
 
-    def zero_center(self, mean=None):
-        if mean is None:
-            mean = self.mean
-
-        for i in range(len(self.instances)):
-            # self.instances[i] -= mean
-            self.instances /= 255.0
+    def zero_center(self, mean):
+        self.instances -= float(mean)
 
     def read_dataset(self, directory, dataset="train", mean=None):
         if dataset == "train":
@@ -108,27 +99,28 @@ class BlockFrameDataset(Dataset):
                 if len(current_block) % 15 == 0:
                     current_block = np.array(current_block)
                     instances.append(current_block.reshape((1, 15, 60, 80)))
-                    labels.append(CATEGORY_IDX[video["category"]])
+                    labels.append(CATEGORY_INDEX[video["category"]])
                     current_block = []
 
         instances = np.array(instances, dtype=np.float32)
         labels = np.array(labels, dtype=np.uint8)
 
-        self.mean = np.mean(instances, axis=0)
+        self.mean = np.mean(instances)
 
         return instances, labels
 
 class BlockFrameFlowDataset(Dataset):
     def __init__(self, directory, dataset="train", mean=None):
-        self.instances, self.labels = self.read_dataset(directory, 
-            dataset, mean)
-
-        self.zero_center(mean)
+        self.instances, self.labels = self.read_dataset(directory, dataset)
 
         for i in range(len(self.instances)):
-            self.instances[i]["frames"] = torch.from_numpy(self.instances[i]["frames"])
-            self.instances[i]["flow_x"] = torch.from_numpy(self.instances[i]["flow_x"])
-            self.instances[i]["flow_y"] = torch.from_numpy(self.instances[i]["flow_y"])
+            self.instances[i]["frames"] = torch.from_numpy(
+                self.instances[i]["frames"])
+            self.instances[i]["flow_x"] = torch.from_numpy(
+                self.instances[i]["flow_x"])
+            self.instances[i]["flow_y"] = torch.from_numpy(
+                self.instances[i]["flow_y"])
+
         self.labels = torch.from_numpy(self.labels)
 
     def __len__(self):
@@ -136,18 +128,17 @@ class BlockFrameFlowDataset(Dataset):
 
     def __getitem__(self, idx):
         sample = { 
-            "instances": self.instances[idx], 
-            "labels": self.labels[idx] 
+            "instance": self.instances[idx], 
+            "label": self.labels[idx] 
         }
 
         return sample
 
-    def zero_center(self, mean=None):
-        if mean is None:
-            mean = self.mean
-
+    def zero_center(self, mean):
         for i in range(len(self.instances)):
-            self.instances[i]["frames"] /= 255
+            self.instances[i]["frames"] -= float(mean["frames"])
+            self.instances[i]["flow_x"] -= float(mean["flow_x"])
+            self.instances[i]["flow_y"] -= float(mean["flow_y"])
 
     def read_dataset(self, directory, dataset="train", mean=None):
         if dataset == "train":
@@ -166,9 +157,9 @@ class BlockFrameFlowDataset(Dataset):
         instances = []
         labels = []
 
-        mean_frames = np.zeros((1, 15, 60, 80), dtype=np.float32)
-        mean_flow_x = np.zeros((1, 14, 30, 40), dtype=np.float32)
-        mean_flow_y = np.zeros((1, 14, 30, 40), dtype=np.float32)
+        mean_frames = 0
+        mean_flow_x = 0
+        mean_flow_y = 0
 
         for i_video in range(len(video_frames)):
             current_block_frame = []
@@ -187,13 +178,19 @@ class BlockFrameFlowDataset(Dataset):
                     current_block_flow_y.append(flow_y[i_frame])
 
                 if (i_frame + 1) % 15 == 0:
-                    current_block_frame = np.array(current_block_frame, dtype=np.float32).reshape((1, 15, 60, 80))
-                    current_block_flow_x = np.array(current_block_flow_x, dtype=np.float32).reshape((1, 14, 30, 40))
-                    current_block_flow_y = np.array(current_block_flow_y, dtype=np.float32).reshape((1, 14, 30, 40))
+                    current_block_frame = np.array(
+                        current_block_frame,
+                        dtype=np.float32).reshape((1, 15, 60, 80))
+                    current_block_flow_x = np.array(
+                        current_block_flow_x,
+                        dtype=np.float32).reshape((1, 14, 30, 40))
+                    current_block_flow_y = np.array(
+                        current_block_flow_y,
+                        dtype=np.float32).reshape((1, 14, 30, 40))
 
-                    mean_frames += current_block_frame
-                    mean_flow_x += current_block_flow_x
-                    mean_flow_y += current_block_flow_y
+                    mean_frames += np.mean(current_block_frame)
+                    mean_flow_x += np.mean(current_block_flow_x)
+                    mean_flow_y += np.mean(current_block_flow_y)
 
                     instances.append({
                         "frames": current_block_frame,
@@ -201,7 +198,8 @@ class BlockFrameFlowDataset(Dataset):
                         "flow_y": current_block_flow_y
                     })
 
-                    labels.append(CATEGORY_IDX[video_frames[i_video]["category"]])
+                    labels.append(
+                        CATEGORY_INDEX[video_frames[i_video]["category"]])
 
                     current_block_frame = []
                     current_block_flow_x = []
@@ -219,12 +217,5 @@ class BlockFrameFlowDataset(Dataset):
 
         labels = np.array(labels, dtype=np.uint8)
 
-        # if dataset == "train":
-        #     p = np.random.choice(len(instances), 256, replace=False)
-        # else:
-        #     p = np.random.choice(len(instances), 64, replace=False)
-
-        # instances = [instances[i] for i in p]
-        # labels = labels[p]
-
         return instances, labels
+

@@ -37,7 +37,9 @@ if __name__ == "__main__":
 
     print("Loading dataset")
     train_set = RawDataset(dataset_dir, "train")
-    dev_set = RawDataset(dataset_dir, "dev", train_set.mean)
+    dev_set = RawDataset(dataset_dir, "dev")
+    train_set.zero_center(train_set.mean)
+    dev_set.zero_center(train_set.mean)
 
     # Create model and optimizer.
     model = CNNSingleFrame()

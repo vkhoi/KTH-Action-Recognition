@@ -56,8 +56,8 @@ def evaluate(model, dataloader, flow=False, use_cuda=False):
     return loss, acc
 
 def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
-    start_epoch=1, log=10, checkpoint_path=None, validate=False, resume=False,
-    flow=False, use_cuda=False):
+          start_epoch=1, log=10, checkpoint_path=None, validate=True,
+          resume=False, flow=False, use_cuda=False):
 
     train_loader = torch.utils.data.DataLoader(
         dataset=train_set, batch_size=batch_size, shuffle=True)
@@ -96,7 +96,7 @@ def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
 
         for i, samples in enumerate(train_loader):
 
-            labels = Variable(samples["labels"])
+            labels = Variable(samples["label"])
             if use_cuda:
                 labels = labels.cuda()
 
@@ -104,7 +104,7 @@ def train(model, num_epochs, train_set, dev_set, lr=1e-3, batch_size=32,
             optimizer.zero_grad()
 
             # Forward, backward, and optimize.
-            outputs = get_outputs(model, samples["instances"], flow=flow,
+            outputs = get_outputs(model, samples["instance"], flow=flow,
                                   use_cuda=use_cuda)
             loss = criterion(outputs, labels)
             loss.backward()
