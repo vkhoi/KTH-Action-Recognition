@@ -202,3 +202,18 @@ def parse_sequence_file():
             current_filename = s + "_uncomp.avi"
 
     return frames_idx
+
+if __name__ == "__main__":
+    print("Making raw train dataset")
+    make_raw_dataset(dataset="train")
+    print("Making raw dev dataset")
+    make_raw_dataset(dataset="dev")
+    print("Making raw test dataset")
+    make_raw_dataset(dataset="test")
+
+    print("Making optical flow features for train dataset")
+    make_optflow_dataset(dataset="train")
+    print("Making optical flow features for dev dataset")
+    make_optflow_dataset(dataset="dev")
+    print("Making optical flow features for test dataset")
+    make_optflow_dataset(dataset="test")
