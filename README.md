@@ -12,6 +12,7 @@ We have tried the following approaches:
 * Optical Flow + Bag-of-Words + SVM: 78.24%.
 * CNN on single frame: 63.43%.
 * CNN on block of frames: 70.37%.
+* CNN on block of frames + optical flow: 90.27%.
 
 ## Prerequisites
 * Python OpenCV.
